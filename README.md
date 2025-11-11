@@ -439,7 +439,7 @@ Contributions welcome!
 
 ## 📝 Changelog
 
-### Version 2.0.0 (2025-01-16)
+### Version 2.0.0 (2025-11-11)
 - ✨ **Full localization (EN/RU)** with automatic language detection
 - ✨ I18n support for all Schema.org, Open Graph, Twitter Cards
 - ✨ Example Telegram IV template rules in [`TELEGRAM_IV_RULES.txt`](TELEGRAM_IV_RULES.txt)
@@ -447,7 +447,7 @@ Contributions welcome!
 - ✨ Enhanced language priority detection (user → site → browser)
 - ✨ URL encoding for Cyrillic characters in slugs/usernames/tags
 
-### Version 1.0.0 (2025-01-16)
+### Version 1.0.0 (2025-11-08)
 - ✨ Initial release
 - ✨ Complete QAPage schema for topics
 - ✨ CollectionPage for categories
