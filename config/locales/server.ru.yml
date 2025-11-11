@@ -1,0 +1,64 @@
+ru:
+  site_settings:
+    rich_microdata_enabled: "Включить плагин Rich Microdata"
+    rich_microdata_content_type: "Тип контента форума для структурированных данных Schema.org"
+    rich_microdata_content_type_choices:
+      discussion: "Форум обсуждений (DiscussionForumPosting + Comment) - Общие обсуждения сообщества"
+      qa: "Форум поддержки Q&A (Question + Answer) - Вопросы и ответы, техподдержка"
+      article: "Блог статей (Article + Comment) - Редакционный контент и статьи"
+      news: "Новостной сайт (NewsArticle + Comment) - Новости и анонсы"
+      review: "Сайт обзоров (Review + Comment/Review) - Обзоры товаров и услуг"
+      recipe: "Сайт рецептов (Recipe + Comment) - Кулинарные рецепты и инструкции"
+      event: "Форум событий (Event + Comment) - Обсуждения событий и мероприятий"
+    rich_microdata_debug_mode: "Включить режим отладки (логи в консоль Rails)"
+    rich_microdata_cache_ttl: "TTL кэша в секундах (по умолчанию: 3600 = 1 час)"
+    rich_microdata_max_answers: "Максимальное количество ответов/реплик в схеме топика"
+    rich_microdata_max_comments: "Максимальное количество вложенных комментариев на ответ"
+    rich_microdata_include_user_stats: "Включить статистику пользователей в схему Person"
+    rich_microdata_enable_website_schema: "Включить схему WebSite на всех страницах"
+    rich_microdata_og_alternate_locales: "Альтернативные языки для Open Graph (коды локалей через запятую). НЕ указывайте основной язык сайта! Только дополнительные языки. Формат: язык_СТРАНА. Примеры: en_US (английский США), ru_RU (русский Россия), zh_CN (китайский Китай), fr_FR (французский Франция), de_DE (немецкий Германия), es_ES (испанский Испания), ja_JP (японский Япония), pt_BR (португальский Бразилия). Несколько языков: en_US, zh_CN, fr_FR"
+    rich_microdata_social_twitter: "Социальная сеть Twitter/X - хэндл или URL профиля (например, @yoursite или https://twitter.com/yoursite)"
+    rich_microdata_social_facebook: "Социальная сеть Facebook - URL страницы (например, https://www.facebook.com/yourpage)"
+    rich_microdata_social_youtube: "Социальная сеть YouTube - URL канала (например, https://www.youtube.com/@yourchannel)"
+    rich_microdata_social_instagram: "Социальная сеть Instagram - URL профиля (например, https://www.instagram.com/yourprofile)"
+    rich_microdata_social_tiktok: "Социальная сеть TikTok - URL профиля (например, https://www.tiktok.com/@yourprofile)"
+    rich_microdata_social_telegram: "Социальная сеть Telegram - URL канала (например, https://t.me/yourchannel)"
+    rich_microdata_social_linkedin: "Социальная сеть LinkedIn - URL компании/профиля (например, https://www.linkedin.com/company/yourcompany)"
+    rich_microdata_social_vk: "Социальная сеть VK - URL страницы (например, https://vk.ru/yourpage)"
+    rich_microdata_social_dzen: "Социальная сеть Дзен - URL канала (например, https://dzen.ru/yourchannel)"
+    rich_microdata_social_tenchat: "Социальная сеть TenChat - URL профиля (например, https://tenchat.ru/yourprofile)"
+    rich_microdata_repo_github: "Репозиторий GitHub - URL организации или профиля пользователя (например, https://github.com/yourorg)"
+    rich_microdata_repo_gitlab: "Репозиторий GitLab - URL организации или профиля пользователя (например, https://gitlab.com/yourorg)"
+    rich_microdata_repo_sourcecraft: "Репозиторий SourceCraft - git-платформа Яндекса для opensource, URL организации или профиля (например, https://sourcecraft.dev/yourorg)"
+    rich_microdata_repo_bitbucket: "Репозиторий Bitbucket - URL организации или профиля пользователя (например, https://bitbucket.org/yourorg)"
+    rich_microdata_og_image_default: "URL изображения Open Graph по умолчанию, если у топика/поста нет изображения (абсолютный URL, например, https://example.com/images/default-og.jpg). Оставьте пустым, чтобы использовать логотип сайта."
+    telegram_iv_enabled: "Включить интеграцию с Telegram Instant View (генерирует мета-теги IV)"
+    telegram_iv_rhash: "ID шаблона Telegram Instant View (rhash из https://instantview.telegram.org/)"
+
+  discourse_rich_microdata:
+    breadcrumb:
+      home: "Главная"
+
+    open_graph:
+      category_description: "Обсуждения в категории %{category_name}"
+      user_description: "Профиль пользователя %{user_name}"
+
+    twitter_card:
+      category_description: "Обсуждения в категории %{category_name}"
+      user_description: "Профиль пользователя %{user_name}"
+      label_replies: "Ответов"
+      label_author: "Автор"
+      label_topics: "Топиков"
+      label_posts: "Постов"
+      label_karma: "Карма"
+
+    profile_page:
+      title: "Профиль %{user_name}"
+
+    interaction_stats:
+      created_topics: "Созданных топиков"
+      written_replies: "Написанных ответов"
+      received_likes: "Полученных лайков"
+      read_posts: "Прочитанных постов"
+      number_of_topics: "Количество топиков"
+      number_of_replies: "Количество ответов"

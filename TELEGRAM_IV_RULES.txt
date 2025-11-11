@@ -1,0 +1,245 @@
+# ============================================
+# Telegram Instant View Template for Discourse Forum
+# ============================================
+# Version: 2.1
+# https://instantview.telegram.org/ -> My Templates
+# My Templates -> Enter a URL (forum post only) to create or edit the corresponding template
+# Example URL https://meta.discourse.org/t/96331 -> Rules
+# Compatible with: Discourse 2.7+
+# Last updated: 2025-01-16
+# Author: KakTak.net
+# ============================================
+
+~version: "2.1"
+
+# ============================================
+# PAGE DETECTION
+# ============================================
+
+# Match all topic pages (URLs like /t/topic-name/123)
+?path: /t/.+/\d+
+
+# ============================================
+# MAIN PROPERTIES
+# ============================================
+
+# Title: Extract from fancy-title or h1
+title: //h1[has-class("fancy-title")]
+title: //h1[@id="topic-title"]
+
+# Subtitle: Category name + tags
+subtitle: //span[has-class("badge-category__name")]
+
+# Author information
+author: //div[has-class("topic-meta-data")]//span[@class="creator"]//a
+author: //span[has-class("username")]//a
+author: //a[@data-user-card]
+
+# Author URL (prepend domain if relative)
+$author_href: //div[has-class("topic-meta-data")]//span[@class="creator"]//a/@href
+$author_href: //span[has-class("username")]//a/@href
+author_url: $author_href
+
+# Published date (ISO 8601 format)
+published_date: //span[has-class("crawler-post-date")]//time/@datetime
+published_date: //time[@itemprop="datePublished"]/@datetime
+published_date: //span[@class="relative-date"]/@data-time
+
+# Cover image: First image from first post
+cover: //div[@id="post_1"]//div[has-class("cooked")]//img[1]/@src
+cover: //article[@data-post-number="1"]//div[has-class("cooked")]//img[1]/@src
+cover: //meta[@property="og:image"]/@content
+
+# Site name
+site_name: //meta[@property="og:site_name"]/@content
+site_name: "Discourse Forum"
+
+# Description for link preview
+description: //meta[@name="description"]/@content
+description: //meta[@property="og:description"]/@content
+
+# ============================================
+# BODY CONTENT EXTRACTION
+# ============================================
+
+# Store main post content
+$main_post: //div[@id="post_1"]//div[has-class("cooked")]
+$main_post: //article[@data-post-number="1"]//div[has-class("cooked")]
+
+# Set body
+body: $main_post
+
+# ============================================
+# CLEAN UP UNWANTED ELEMENTS
+# ============================================
+
+# Remove navigation, ads, polls, reactions
+@remove: $body//nav
+@remove: $body//footer
+@remove: $body//aside[has-class("onebox")]
+@remove: $body//div[has-class("lightbox-wrapper")]
+@remove: $body//div[has-class("meta")]
+@remove: $body//div[has-class("quote-controls")]
+@remove: $body//div[has-class("poll")]
+@remove: $body//div[has-class("discourse-reactions")]
+@remove: $body//div[@class="post-menu-area"]
+@remove: $body//div[@class="actions"]
+
+# Clean empty paragraphs
+@remove: $body//p[not(normalize-space())]
+
+# ============================================
+# FORMATTING PRESERVATION
+# ============================================
+
+# Images: Make responsive and handle lazy loading
+<figure>: $body//img
+  <img>: $@
+  @set_attr(loading, "lazy"): $@
+
+# Code blocks: Preserve with proper formatting
+<pre>: $body//pre
+  @pre: $@
+
+<code>: $body//code[not(parent::pre)]
+  @pre: $@
+
+# Blockquotes and Discourse quotes
+<blockquote>: $body//blockquote
+<aside>: $body//aside[has-class("quote")]
+  @replace_tag(<blockquote>): $@
+
+# Lists
+<ul>: $body//ul
+<ol>: $body//ol
+<li>: $body//li
+
+# Headers
+<h2>: $body//h2
+<h3>: $body//h3
+<h4>: $body//h4
+<h5>: $body//h5
+<h6>: $body//h6
+
+# Text formatting
+<strong>: $body//strong
+<em>: $body//em
+<s>: $body//s
+<s>: $body//del
+<u>: $body//u
+<mark>: $body//mark
+
+# ============================================
+# EMBEDDED CONTENT HANDLING
+# ============================================
+
+# YouTube videos
+<iframe>: $body//iframe[contains(@src, "youtube.com")]
+<iframe>: $body//iframe[contains(@src, "youtu.be")]
+  @set_attr(width, "100%"): $@
+  @set_attr(height, "auto"): $@
+
+# Vimeo videos
+<iframe>: $body//iframe[contains(@src, "vimeo.com")]
+  @set_attr(width, "100%"): $@
+
+# Twitter embeds
+<blockquote>: $body//blockquote[has-class("twitter-tweet")]
+
+# GitHub Gists - convert to links
+$gist: $body//script[contains(@src, "gist.github.com")]
+@set_attr(href, @src): $@/a
+@append_to($@/a): "View GitHub Gist"
+@remove: $gist
+
+# ============================================
+# REPLIES/COMMENTS (Optional)
+# ============================================
+
+# Show header before replies
+@append_to($@): "💬 Replies"
+
+# Extract top 5 replies
+$reply_2: //article[@data-post-number="2"]//div[has-class("cooked")]
+
+$reply_3: //article[@data-post-number="3"]//div[has-class("cooked")]
+
+$reply_4: //article[@data-post-number="4"]//div[has-class("cooked")]
+
+$reply_5: //article[@data-post-number="5"]//div[has-class("cooked")]
+
+$reply_6: //article[@data-post-number="6"]//div[has-class("cooked")]
+
+# ============================================
+# LINKS HANDLING
+# ============================================
+
+# Make all links absolute
+<a>: $body//a
+
+# Handle internal links
+<a>: $body//a[@href^="/"]
+
+# ============================================
+# CHANNEL INTEGRATION (Optional)
+# ============================================
+
+# Link to Telegram channel if available
+channel: //meta[@property="telegram:channel"]/@content
+
+# Or use category as channel indicator
+channel: //span[has-class("badge-category__name")]
+
+# ============================================
+# ADVANCED FEATURES (Uncomment if needed)
+# ============================================
+
+# Add related topics section
+# @after_body: <h3>Related Topics</h3>
+# @after_body: //div[@id="suggested-topics"]//a[@class="title"]
+
+# Add tags section
+# @after_body: <div class="tags">
+# @append_to($@): //div[has-class("discourse-tags")]//a
+# @append_to($@): </div>
+
+# ============================================
+# DOMAIN DETECTION
+# ============================================
+
+# Extract base domain from meta tags
+$domain_url: //meta[@property="og:url"]/@content
+$domain: $domain_url
+@match("(https?://[^/]+)"): $domain
+@replace("(https?://[^/]+).*", "$1"): $domain
+
+# ============================================
+# FINAL CLEANUP
+# ============================================
+
+# Remove empty elements
+@remove: $body//*[not(normalize-space()) and not(self::img) and not(self::iframe)]
+
+# Remove script tags if any
+@remove: $body//script
+@remove: $body//style
+
+# ============================================
+# NOTES
+# ============================================
+
+# To customize:
+# 1. Adjust number of replies by adding/removing $reply_N sections
+# 2. Enable/disable channel integration
+# 3. Add custom CSS classes for styling
+# 4. Modify XPath selectors for your Discourse theme
+
+# To test:
+# 1. Go to https://instantview.telegram.org/
+# 2. Paste this template
+# 3. Enter your forum URL: https://yourforum.com/t/topic/123
+# 4. Click "Preview"
+# 5. Adjust as needed
+# 6. Publish and get rhash
+
+# Support: https://github.com/kaktaknet/discourse-rich-json-ld-microdata

@@ -1,0 +1,137 @@
+plugins:
+  rich_microdata_enabled:
+    default: true
+    client: true
+    description: "Enable comprehensive Open Graph and Schema.org JSON-LD microdata markup"
+
+  rich_microdata_content_type:
+    default: discussion
+    type: enum
+    choices:
+      - discussion
+      - qa
+      - article
+      - news
+      - review
+      - recipe
+      - event
+    description: "Choose the primary content type for your forum to generate appropriate Schema.org structured data"
+
+  rich_microdata_cache_ttl:
+    default: 3600
+    min: 300
+    max: 86400
+    description: "Cache duration for generated meta tags (in seconds)"
+
+  rich_microdata_include_user_stats:
+    default: true
+    description: "Include user interaction statistics in Person schema"
+
+  rich_microdata_max_answers:
+    default: 10
+    min: 5
+    max: 50
+    description: "Maximum number of answers to include in suggestedAnswer array"
+
+  rich_microdata_max_comments:
+    default: 5
+    min: 0
+    max: 20
+    description: "Maximum number of nested comments per answer"
+
+  rich_microdata_og_image_default:
+    default: ""
+    type: string
+    textarea: false
+    description: "Default Open Graph image URL when topic/post has no image (absolute URL, e.g., https://example.com/images/default-og.jpg). Leave empty to use site logo."
+
+  rich_microdata_og_alternate_locales:
+    default: ""
+    type: string
+    description: "Alternate languages for og:locale:alternate (comma-separated, e.g., en_US, zh_CN). DO NOT include your site's main language here - only additional languages!"
+
+  rich_microdata_social_twitter:
+    default: ""
+    description: "Social Twitter/X - site handle or profile URL (e.g., @yoursite or https://twitter.com/yoursite)"
+
+  rich_microdata_social_facebook:
+    default: ""
+    type: string
+    description: "Social Facebook - page URL (e.g., https://www.facebook.com/yourpage)"
+
+  rich_microdata_social_youtube:
+    default: ""
+    type: string
+    description: "Social YouTube - channel URL (e.g., https://www.youtube.com/@yourchannel)"
+
+  rich_microdata_social_instagram:
+    default: ""
+    type: string
+    description: "Social Instagram - profile URL (e.g., https://www.instagram.com/yourprofile)"
+
+  rich_microdata_social_tiktok:
+    default: ""
+    type: string
+    description: "Social TikTok - profile URL (e.g., https://www.tiktok.com/@yourprofile)"
+
+  rich_microdata_social_telegram:
+    default: ""
+    type: string
+    description: "Social Telegram - channel URL (e.g., https://t.me/yourchannel)"
+
+  rich_microdata_social_linkedin:
+    default: ""
+    type: string
+    description: "Social LinkedIn - company/profile URL (e.g., https://www.linkedin.com/company/yourcompany)"
+
+  rich_microdata_social_vk:
+    default: ""
+    type: string
+    description: "Social VK - page URL (e.g., https://vk.ru/yourpage)"
+
+  rich_microdata_social_dzen:
+    default: ""
+    type: string
+    description: "Social Dzen - channel URL (e.g., https://dzen.ru/yourchannel)"
+
+  rich_microdata_social_tenchat:
+    default: ""
+    type: string
+    description: "Social TenChat - profile URL (e.g., https://tenchat.ru/yourprofile)"
+
+  rich_microdata_repo_github:
+    default: ""
+    type: string
+    description: "Repository GitHub - organization or user profile (e.g., https://github.com/yourorg)"
+
+  rich_microdata_repo_gitlab:
+    default: ""
+    type: string
+    description: "Repository GitLab - organization or user profile (e.g., https://gitlab.com/yourorg)"
+
+  rich_microdata_repo_sourcecraft:
+    default: ""
+    type: string
+    description: "Repository SourceCraft - organization or user profile (e.g., https://sourcecraft.dev/yourorg)"
+
+  rich_microdata_repo_bitbucket:
+    default: ""
+    type: string
+    description: "Repository Bitbucket - organization or user profile (e.g., https://bitbucket.org/yourorg)"
+
+  rich_microdata_enable_breadcrumbs:
+    default: true
+    client: true
+    description: "Include BreadcrumbList schema in all pages"
+
+  rich_microdata_enable_website_schema:
+    default: true
+    description: "Include WebSite schema with SearchAction on all pages"
+
+  rich_microdata_debug_mode:
+    default: false
+    description: "Enable debug logging for microdata generation"
+
+  rich_microdata_validate_output:
+    default: false
+    description: "Validate generated JSON-LD against Schema.org (slower, use in development)"

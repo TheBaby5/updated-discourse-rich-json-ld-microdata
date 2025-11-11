@@ -1,0 +1,64 @@
+en:
+  site_settings:
+    rich_microdata_enabled: "Enable Rich Microdata Plugin"
+    rich_microdata_content_type: "Forum content type for Schema.org structured data"
+    rich_microdata_content_type_choices:
+      discussion: "Discussion Forum (DiscussionForumPosting + Comment) - General community discussions"
+      qa: "Q&A Support Forum (Question + Answer) - Support and help topics"
+      article: "Article Blog (Article + Comment) - Editorial content and blog posts"
+      news: "News Site (NewsArticle + Comment) - News articles and announcements"
+      review: "Review Site (Review + Comment/Review) - Product or service reviews"
+      recipe: "Recipe Site (Recipe + Comment) - Cooking recipes and instructions"
+      event: "Event Forum (Event + Comment) - Event discussions and announcements"
+    rich_microdata_debug_mode: "Enable Debug Mode (logs to Rails console)"
+    rich_microdata_cache_ttl: "Cache TTL in seconds (default: 3600 = 1 hour)"
+    rich_microdata_max_answers: "Maximum number of answers/replies to include in topic schema"
+    rich_microdata_max_comments: "Maximum number of nested comments per reply"
+    rich_microdata_include_user_stats: "Include user statistics in Person schema"
+    rich_microdata_enable_website_schema: "Enable WebSite schema on all pages"
+    rich_microdata_og_alternate_locales: "Alternate languages for Open Graph (comma-separated locale codes). DO NOT include your main site language! Only additional languages. Format: language_COUNTRY. Examples: en_US (English USA), ru_RU (Russian Russia), zh_CN (Chinese China), fr_FR (French France), de_DE (German Germany), es_ES (Spanish Spain), ja_JP (Japanese Japan), pt_BR (Portuguese Brazil). Multiple: en_US, zh_CN, fr_FR"
+    rich_microdata_social_twitter: "Social Twitter/X - site handle or profile URL (e.g., @yoursite or https://twitter.com/yoursite)"
+    rich_microdata_social_facebook: "Social Facebook - page URL (e.g., https://www.facebook.com/yourpage)"
+    rich_microdata_social_youtube: "Social YouTube - channel URL (e.g., https://www.youtube.com/@yourchannel)"
+    rich_microdata_social_instagram: "Social Instagram - profile URL (e.g., https://www.instagram.com/yourprofile)"
+    rich_microdata_social_tiktok: "Social TikTok - profile URL (e.g., https://www.tiktok.com/@yourprofile)"
+    rich_microdata_social_telegram: "Social Telegram - channel URL (e.g., https://t.me/yourchannel)"
+    rich_microdata_social_linkedin: "Social LinkedIn - company/profile URL (e.g., https://www.linkedin.com/company/yourcompany)"
+    rich_microdata_social_vk: "Social VK - page URL (e.g., https://vk.ru/yourpage)"
+    rich_microdata_social_dzen: "Social Dzen - channel URL (e.g., https://dzen.ru/yourchannel)"
+    rich_microdata_social_tenchat: "Social TenChat - profile URL (e.g., https://tenchat.ru/yourprofile)"
+    rich_microdata_repo_github: "Repository GitHub - organization or user profile URL (e.g., https://github.com/yourorg)"
+    rich_microdata_repo_gitlab: "Repository GitLab - organization or user profile URL (e.g., https://gitlab.com/yourorg)"
+    rich_microdata_repo_sourcecraft: "Repository SourceCraft - Yandex opensource git platform, organization or user profile URL (e.g., https://sourcecraft.dev/yourorg)"
+    rich_microdata_repo_bitbucket: "Repository Bitbucket - organization or user profile URL (e.g., https://bitbucket.org/yourorg)"
+    rich_microdata_og_image_default: "Default Open Graph image URL when topic/post has no image (absolute URL, e.g., https://example.com/images/default-og.jpg). Leave empty to use site logo."
+    telegram_iv_enabled: "Enable Telegram Instant View integration (generates IV meta tags)"
+    telegram_iv_rhash: "Telegram Instant View Template ID (rhash from https://instantview.telegram.org/)"
+
+  discourse_rich_microdata:
+    breadcrumb:
+      home: "Home"
+
+    open_graph:
+      category_description: "Discussions in %{category_name}"
+      user_description: "User profile %{user_name}"
+
+    twitter_card:
+      category_description: "Discussions in %{category_name}"
+      user_description: "User profile %{user_name}"
+      label_replies: "Replies"
+      label_author: "Author"
+      label_topics: "Topics"
+      label_posts: "Posts"
+      label_karma: "Karma"
+
+    profile_page:
+      title: "Profile %{user_name}"
+
+    interaction_stats:
+      created_topics: "Created topics"
+      written_replies: "Written replies"
+      received_likes: "Received likes"
+      read_posts: "Read posts"
+      number_of_topics: "Number of topics"
+      number_of_replies: "Number of replies"
