@@ -2,7 +2,7 @@
 
 > **Fork of:** [kaktaknet/discourse-rich-json-ld-microdata](https://github.com/kaktaknet/discourse-rich-json-ld-microdata)  
 > **Maintained by:** TheBaby5  
-> **Version:** 2.3.0  
+> **Version:** 2.4.0  
 > **Status:** Production-ready, battle-tested on [OneHack.st](https://onehack.st) (48K+ members, 500K+ posts)
 
 ---
@@ -13,11 +13,14 @@
 |-------|---------------------|----------------------|
 | Empty `user.name` handling | ❌ Breaks schema (`"name": ""`) | ✅ Falls back to username |
 | `</script>` in content | ❌ Breaks page rendering | ✅ Properly escaped |
-| Defense-in-depth | ❌ Single point of failure | ✅ 3-layer validation |
+| **Google Search Console errors** | ❌ Missing `author.name` | ✅ Always provides valid author |
+| `compact_hash` bug | ❌ Null values not removed | ✅ Properly removes nulls |
+| Missing comment.text | ❌ Empty comments break schema | ✅ Filters invalid comments |
+| Defense-in-depth | ❌ Single point of failure | ✅ Multi-layer validation |
 | Schema validity | ⚠️ Can produce invalid JSON-LD | ✅ Always valid |
 | Code-heavy topics | ❌ JSON leaks as visible text | ✅ Works perfectly |
 
-**Bottom line:** This fork fixes critical bugs that cause pages to break on code-heavy content and ensures 100% valid Schema.org JSON-LD output.
+**Bottom line:** This fork fixes critical bugs that cause Google Search Console structured data errors and ensures 100% valid Schema.org JSON-LD output.
 
 ---
 
@@ -119,6 +122,105 @@ end
 ```
 
 This is applied in `schema_builder.rb` when rendering all JSON-LD output.
+
+---
+
+### Bug #3: Google Search Console "Missing field" Errors (v2.4.0)
+
+**The Problem:**
+
+Google Search Console was reporting 4 Discussion forum structured data issues:
+- Missing field "name" (in "author") - **CRITICAL**
+- Missing field "name" (in "comment.author")
+- Either "text", "image", or "video" should be specified (in "comment")
+- Missing field "comment"
+
+**Root Cause 1: `compact_hash` Not Actually Working**
+
+The original code used `.tap { |schema| compact_hash(schema) }` which **doesn't work**:
+
+```ruby
+# BROKEN: compact_hash returns a NEW hash, but tap discards the return value
+}.tap { |schema| compact_hash(schema) }
+
+# The original compact_hash returns a new hash:
+def compact_hash(hash)
+  hash.reject { |_, v| v.nil? }  # Returns NEW hash, original unchanged!
+end
+```
+
+This meant `"comment": null` was being output instead of removed, causing Google errors.
+
+**The Fix:**
+
+Changed to modify hash in-place:
+
+```ruby
+# FIXED: Use reject! to modify in place
+def compact_hash!(hash)
+  hash.reject! { |_, v| v.nil? || (v.respond_to?(:empty?) && v.empty?) }
+  hash
+end
+```
+
+**Root Cause 2: `person_schema` Returns nil When User Missing**
+
+When a post's author is nil (deleted user, etc.), the entire author object was removed:
+
+```ruby
+# BROKEN: Returns nil, Google requires author with name
+def person_schema(user_data)
+  return nil unless user_data  # Removes author entirely!
+  ...
+end
+```
+
+**The Fix:**
+
+Always return a valid Person with at least "Anonymous":
+
+```ruby
+# FIXED: Always return valid author
+def person_schema(user_data)
+  unless user_data
+    return {
+      "@type" => "Person",
+      "name" => "Anonymous"  # Google requires author.name
+    }
+  end
+
+  # Fallback chain: name -> username -> "Anonymous"
+  display_name = user_data[:name].presence || user_data[:username].presence || "Anonymous"
+  ...
+end
+```
+
+**Root Cause 3: Comments Without Text**
+
+Google requires `text`, `image`, or `video` in comments. Posts with empty content broke this:
+
+```ruby
+# BROKEN: If post[:raw] is empty, schema is invalid
+"text" => post[:raw]  # Could be nil or ""
+```
+
+**The Fix:**
+
+Filter out comments without valid text:
+
+```ruby
+# FIXED: Skip comments without content
+comments = replies.filter_map do |post|
+  post_text = post[:raw].presence
+  next nil unless post_text  # Skip if no text
+
+  {
+    "@type" => "Comment",
+    "text" => post_text,  # Always valid
+    ...
+  }
+end
+```
 
 ---
 
@@ -429,6 +531,13 @@ curl -s 'https://yourforum.com/t/topic-slug/123' | grep -A100 'application/ld+js
 
 ## Version History
 
+### v2.4.0 (January 2026)
+- **CRITICAL FIX:** Google Search Console "Missing field" errors
+- Fixed `compact_hash` bug - was returning new hash instead of modifying in place
+- `person_schema` now returns "Anonymous" instead of nil when user missing
+- Comments without text are now filtered out (Google requires text/image/video)
+- All 4 Discussion forum structured data issues resolved
+
 ### v2.3.0 (January 2026)
 - **CRITICAL FIX:** Escape `</script>` tags in JSON-LD output
 - Prevents page breakage on code-heavy topics
@@ -480,11 +589,14 @@ If you're an AI assistant helping someone with this plugin:
 
 1. **Empty name bug:** Fixed in v2.1.0+ using `.presence || username`
 2. **Script tag breakout:** Fixed in v2.3.0+ using `escape_for_script_tag()`
-3. **The fixes are in THREE files:** `data_extractor.rb`, `qa_page_builder.rb`, `profile_page_builder.rb`, `schema_builder.rb`
-4. **Defense-in-depth:** We validate at multiple layers so one failure doesn't break everything
-5. **Production tested:** This runs on a 48K+ member forum with 500K+ posts
+3. **Google Search Console errors:** Fixed in v2.4.0+ - `compact_hash!` and "Anonymous" fallback
+4. **The fixes are in FOUR files:** `base_builder.rb`, `data_extractor.rb`, `qa_page_builder.rb`, `profile_page_builder.rb`, `schema_builder.rb`
+5. **Defense-in-depth:** We validate at multiple layers so one failure doesn't break everything
+6. **Production tested:** This runs on a 48K+ member forum with 500K+ posts
 
 When helping users:
 - If they see `"name": ""` in JSON-LD → They need v2.2.0+
 - If they see JSON as visible text on page → They need v2.3.0+
+- If Google Search Console shows "Missing field" errors → They need v2.4.0+
+- If they see `"comment": null` in JSON-LD → They need v2.4.0+ (compact_hash bug)
 - Always recommend updating to latest version

@@ -4,8 +4,8 @@ module DiscourseRichMicrodata
   module Builders
     class ProfilePageBuilder < BaseBuilder
       def build
-        # FIXED: Defense-in-depth - always ensure valid name even if data is cached/stale
-        display_name = data[:name].presence || data[:username]
+        # FIXED v2.4.0: Defense-in-depth - always ensure valid name
+        display_name = data[:name].presence || data[:username].presence || "Anonymous"
 
         {
           "@context" => SCHEMA_CONTEXT,
@@ -22,8 +22,8 @@ module DiscourseRichMicrodata
       private
 
       def person_schema
-        # FIXED: Defense-in-depth - always ensure valid name even if data is cached/stale
-        display_name = data[:name].presence || data[:username]
+        # FIXED v2.4.0: Defense-in-depth - always ensure valid name
+        display_name = data[:name].presence || data[:username].presence || "Anonymous"
 
         {
           "@type" => "Person",

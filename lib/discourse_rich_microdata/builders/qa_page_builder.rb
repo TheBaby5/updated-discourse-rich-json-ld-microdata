@@ -129,6 +129,7 @@ module DiscourseRichMicrodata
         end
       end
 
+      # FIXED v2.4.0: Ensure nested comments also have valid text
       def nested_comments_schemas(parent_post)
         replies = data[:posts]&.select { |p| p[:reply_to_post_number] == parent_post[:post_number] }
         return nil if replies.blank?
@@ -136,30 +137,43 @@ module DiscourseRichMicrodata
         max_comments = SiteSetting.rich_microdata_max_comments
         replies = replies.first(max_comments)
 
-        replies.map do |reply|
+        comments = replies.filter_map do |reply|
+          # Skip comments without text content
+          reply_text = truncate_text(reply[:raw], 500)
+          next nil unless reply_text.present?
+
           {
             "@type" => "Comment",
             "@id" => "#{reply[:url]}#comment",
             "url" => reply[:url],
-            "text" => truncate_text(reply[:raw], 500),
+            "text" => reply_text,
             "dateCreated" => iso8601_date(reply[:created_at]),
             "upvoteCount" => reply[:like_count] || 0,
             "author" => person_schema(reply[:author]),
             "parentItem" => { "@id" => "#{parent_post[:url]}#answer" }
           }.tap { |comment| compact_hash(comment) }
         end
+
+        comments.empty? ? nil : comments
       end
 
-      # FIXED: Defense-in-depth - always ensure valid name even if data is cached/stale
+      # FIXED v2.4.0: Google requires author.name - NEVER return nil
+      # Defense-in-depth: multiple fallbacks ensure valid author always exists
       def person_schema(user_data)
-        return nil unless user_data
+        # If no user data at all, return Anonymous author (Google still requires author.name)
+        unless user_data
+          return {
+            "@type" => "Person",
+            "name" => "Anonymous"
+          }
+        end
 
-        # Fallback to username if name is nil or empty string
-        display_name = user_data[:name].presence || user_data[:username]
+        # Fallback chain: name -> username -> "Anonymous"
+        display_name = user_data[:name].presence || user_data[:username].presence || "Anonymous"
 
         {
           "@type" => "Person",
-          "@id" => "#{user_data[:url]}#person",
+          "@id" => user_data[:url] ? "#{user_data[:url]}#person" : nil,
           "name" => display_name,
           "identifier" => user_data[:username],
           "url" => user_data[:url],
@@ -219,6 +233,8 @@ module DiscourseRichMicrodata
         }.tap { |counter| compact_hash(counter) }
       end
 
+      # FIXED v2.4.0: Google requires text/image/video in comments
+      # Skip comments without content, ensure valid comment array
       def comments_schemas(content_type)
         replies = data[:posts]&.reject { |p| p[:is_first_post] }
         return nil if replies.blank?
@@ -228,21 +244,26 @@ module DiscourseRichMicrodata
 
         return nil if replies.empty?
 
-        # For review type, replies can also be Review. For others, use Comment.
-        comment_type = (content_type == 'review') ? 'Comment' : 'Comment'
+        # Build comments, filtering out any without valid text content
+        comments = replies.filter_map do |post|
+          # Google requires either text, image, or video - skip if no text
+          post_text = post[:raw].presence
+          next nil unless post_text
 
-        replies.map do |post|
           {
-            "@type" => comment_type,
+            "@type" => "Comment",
             "@id" => "#{post[:url]}#comment",
             "url" => post[:url],
-            "text" => post[:raw],
+            "text" => post_text,
             "dateCreated" => iso8601_date(post[:created_at]),
             "dateModified" => iso8601_date(post[:updated_at]),
             "upvoteCount" => post[:like_count] || 0,
             "author" => person_schema(post[:author])
           }.tap { |comment| compact_hash(comment) }
         end
+
+        # Return nil if all comments were filtered out (will be removed by compact_hash)
+        comments.empty? ? nil : comments
       end
 
       def website_reference

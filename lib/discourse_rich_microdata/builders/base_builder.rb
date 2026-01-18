@@ -64,9 +64,16 @@ module DiscourseRichMicrodata
         { "@id" => entity_id(url) }
       end
 
-      def compact_hash(hash)
-        hash.reject { |_, v| v.nil? || (v.respond_to?(:empty?) && v.empty?) }
+      # FIXED: Use reject! to modify hash in place (was returning new hash, discarding it)
+      # This fixes the Google Search Console "missing field" errors where null values
+      # were being kept in the schema instead of removed
+      def compact_hash!(hash)
+        hash.reject! { |_, v| v.nil? || (v.respond_to?(:empty?) && v.empty?) }
+        hash
       end
+
+      # Alias for backwards compatibility (some code might still call compact_hash)
+      alias_method :compact_hash, :compact_hash!
 
       def t(key, opts = {})
         I18n.t("discourse_rich_microdata.#{key}", **opts.merge(locale: options[:i18n_locale] || :en))
