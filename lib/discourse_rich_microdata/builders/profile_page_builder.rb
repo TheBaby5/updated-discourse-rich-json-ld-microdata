@@ -4,12 +4,15 @@ module DiscourseRichMicrodata
   module Builders
     class ProfilePageBuilder < BaseBuilder
       def build
+        # FIXED: Defense-in-depth - always ensure valid name even if data is cached/stale
+        display_name = data[:name].presence || data[:username]
+
         {
           "@context" => SCHEMA_CONTEXT,
           "@type" => "ProfilePage",
           "@id" => data[:url],
           "url" => data[:url],
-          "name" => t('profile_page.title', user_name: data[:name]),
+          "name" => t('profile_page.title', user_name: display_name),
           "inLanguage" => options[:language],
           "isPartOf" => { "@id" => "#{base_url}/#website" },
           "mainEntity" => person_schema
@@ -19,11 +22,14 @@ module DiscourseRichMicrodata
       private
 
       def person_schema
+        # FIXED: Defense-in-depth - always ensure valid name even if data is cached/stale
+        display_name = data[:name].presence || data[:username]
+
         {
           "@type" => "Person",
           "@id" => "#{data[:url]}#person",
           "identifier" => data[:username],
-          "name" => data[:name],
+          "name" => display_name,
           "url" => data[:url],
           "image" => avatar_image_schema,
           "description" => data[:bio],

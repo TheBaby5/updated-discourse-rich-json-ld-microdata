@@ -150,13 +150,17 @@ module DiscourseRichMicrodata
         end
       end
 
+      # FIXED: Defense-in-depth - always ensure valid name even if data is cached/stale
       def person_schema(user_data)
         return nil unless user_data
+
+        # Fallback to username if name is nil or empty string
+        display_name = user_data[:name].presence || user_data[:username]
 
         {
           "@type" => "Person",
           "@id" => "#{user_data[:url]}#person",
-          "name" => user_data[:name],
+          "name" => display_name,
           "identifier" => user_data[:username],
           "url" => user_data[:url],
           "image" => user_data[:avatar_url] ? avatar_image_schema(user_data[:avatar_url]) : nil,
