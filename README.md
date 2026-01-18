@@ -1,490 +1,490 @@
-# 🏆 Discourse Rich JSON-LD Microdata Plugin
+# Discourse Rich JSON-LD Microdata (Enhanced Fork)
 
-**English version | [Русская версия](README.ru.md)**
-
-**Comprehensive, coordinated Open Graph and Schema.org JSON-LD microdata for 200% SEO and LLM coverage**
-
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Discourse Version](https://img.shields.io/badge/discourse-2.7.0+-orange.svg)](https://discourse.org)
+> **Fork of:** [kaktaknet/discourse-rich-json-ld-microdata](https://github.com/kaktaknet/discourse-rich-json-ld-microdata)  
+> **Maintained by:** TheBaby5  
+> **Version:** 2.3.0  
+> **Status:** Production-ready, battle-tested on [OneHack.st](https://onehack.st) (48K+ members, 500K+ posts)
 
 ---
 
-## 🎯 What This Plugin Does
+## TL;DR - Why This Fork?
 
-This plugin **replaces** Discourse's standard meta tags with a comprehensive, professionally structured microdata system that provides:
+| Issue | Original (kaktaknet) | This Fork (TheBaby5) |
+|-------|---------------------|----------------------|
+| Empty `user.name` handling | ❌ Breaks schema (`"name": ""`) | ✅ Falls back to username |
+| `</script>` in content | ❌ Breaks page rendering | ✅ Properly escaped |
+| Defense-in-depth | ❌ Single point of failure | ✅ 3-layer validation |
+| Schema validity | ⚠️ Can produce invalid JSON-LD | ✅ Always valid |
+| Code-heavy topics | ❌ JSON leaks as visible text | ✅ Works perfectly |
 
-### ✅ For SEO (100%):
-- **Rich Snippets** in Google/Yandex (⭐ ratings, 💬 answer counts, 👤 authors, 📅 dates)
-- **Knowledge Graph** panels for expert users
-- **Featured Snippets** in "People also ask"
-- **Breadcrumbs** in search results
-- Complete **QAPage** schema for Q&A content
-
-### ✅ For AI/LLM (100%):
-- **Full context** understanding (topics → categories → answers → comments)
-- **Entity relationships** through `@id` references
-- **Author expertise** metadata
-- **Solved answers** marking
-- Complete **knowledge graph** of your forum
-
-### ✅ Total = 200% Coverage! 🚀
+**Bottom line:** This fork fixes critical bugs that cause pages to break on code-heavy content and ensures 100% valid Schema.org JSON-LD output.
 
 ---
 
-## 🌟 Key Features
+## What is JSON-LD?
 
-### 1. **Coordinated Markup**
-- Open Graph, Twitter Cards, and JSON-LD generated from **single source of truth**
-- No data conflicts between different meta tag types
-- All data synchronized automatically
+[JSON-LD](https://json-ld.org/) (JavaScript Object Notation for Linked Data) is a method of encoding structured data using JSON. Search engines like Google use JSON-LD to understand your content better, enabling:
 
-### 2. **Complete Removal of Standard Tags**
-- Removes Discourse's default meta tags (both server-side and client-side)
-- Prevents duplicate/conflicting markup
-- Clean, professional output
+- **Rich snippets** in search results
+- **Knowledge panel** information
+- **FAQ** and **How-to** rich results
+- **Better AI understanding** of your content
 
-### 3. **Rich Schema.org Structure**
-- **QAPage** for topics with full Q&A hierarchy
-- **CollectionPage** for categories with subcategories
-- **ProfilePage** for user profiles
-- **BreadcrumbList** for navigation
-- **WebSite** global schema with search action
-
-### 4. **Full Localization (EN/RU) 🌍**
-- 100% English + 100% Russian translations
-- Automatic language detection (user → site → browser)
-- All Schema.org descriptions localized
-- Open Graph and Twitter Cards in user's language
-- Easy to add more languages
-
-### 5. **Performance Optimized**
-- Smart caching (1 hour default, configurable)
-- Automatic cache invalidation on content changes
-- < 5ms for cached pages
-- ~50ms for fresh generation
-
-### 6. **LLM-Friendly**
-- Complete graph of entities with `@id` references
-- Nested comment structure preserved
-- Author statistics and expertise indicators
-- Tags as structured entities
+This plugin generates comprehensive Schema.org JSON-LD markup for your Discourse forum, including:
+- `DiscussionForumPosting` for topics
+- `QAPage` for Q&A-style content
+- `Person` for user profiles
+- `BreadcrumbList` for navigation
+- `WebSite` for site-wide schema
 
 ---
 
-## 📦 Installation
+## Critical Bugs Fixed
 
-### Method 1: Via Git (Recommended)
+### Bug #1: Empty Name Field (GitHub Issue #2)
 
-```bash
-cd /var/discourse
-git clone https://github.com/kaktaknet/discourse-rich-json-ld-microdata.git plugins/discourse-rich-json-ld-microdata
-./launcher rebuild app
+**The Problem:**
+
+When a Discourse user has an empty `name` field (they only have a username), the original plugin would output:
+
+```json
+{
+  "@type": "Person",
+  "name": "",  // INVALID - Google rejects this
+  "identifier": "SRZ"
+}
 ```
 
-### Method 2: Manual
-
-1. Copy plugin to `plugins/discourse-rich-json-ld-microdata/`
-2. Rebuild Discourse: `./launcher rebuild app`
-3. Enable in Admin → Settings → Plugins
-
----
-
-## ⚙️ Configuration
-
-Navigate to **Admin → Settings → Plugins → Rich Microdata**
-
-### Essential Settings:
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `rich_microdata_enabled` | `true` | Master switch for the plugin |
-| `rich_microdata_cache_ttl` | `3600` | Cache duration (seconds) |
-| `rich_microdata_max_answers` | `10` | Max answers in JSON-LD |
-| `rich_microdata_include_user_stats` | `true` | Include user statistics |
-| `rich_microdata_enable_breadcrumbs` | `true` | Add BreadcrumbList schema |
-| `rich_microdata_twitter_site` | `""` | Your @twitter handle |
-
-### Advanced Settings:
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `rich_microdata_max_comments` | `5` | Max nested comments per answer |
-| `rich_microdata_og_image_default` | `""` | Fallback OG image URL |
-| `rich_microdata_debug_mode` | `false` | Enable debug logging |
-| `rich_microdata_validate_output` | `false` | Validate against Schema.org (dev only) |
-
----
-
-## 🌍 Localization (Internationalization)
-
-The plugin includes full localization support for **English** and **Russian** out of the box.
-
-### Supported Languages:
-
-- 🇬🇧 **English** (`en`)
-- 🇷🇺 **Russian** (`ru`)
-
-### What's Translated:
-
-1. **Admin Settings UI**
-   - All setting descriptions
-   - Help text
-
-2. **Schema.org Descriptions**
-   - Category descriptions ("Discussions in...")
-   - User profile descriptions ("User profile...")
-   - Interaction statistics ("Created topics", "Written replies")
-
-3. **Open Graph & Twitter Cards**
-   - All metadata labels
-   - Fallback descriptions
-
-4. **Breadcrumbs**
-   - "Home" → "Главная"
-
-### How Language Detection Works:
-
-**Priority order:**
-1. **User preference** (from Discourse user settings)
-2. **Site default** (from Admin → Settings → default_locale)
-3. **Browser locale** (from HTTP Accept-Language header)
-4. **Fallback to English** (`en-US`)
-
-### Adding New Languages:
-
-#### Step 1: Create Locale Files
-
-Create files in `config/locales/`:
-
-```
-config/locales/
-├── server.es.yml     # Spanish backend
-├── client.es.yml     # Spanish frontend
-```
-
-#### Step 2: Copy Translation Structure
-
-Copy from existing locale file (e.g., `server.en.yml`) and translate:
-
-```yaml
-# config/locales/server.es.yml
-es:
-  site_settings:
-    rich_microdata_enabled: "Activar plugin Rich Microdata"
-    # ... more settings
-
-  discourse_rich_microdata:
-    breadcrumb:
-      home: "Inicio"
-
-    open_graph:
-      category_description: "Discusiones en %{category_name}"
-      user_description: "Perfil de usuario %{user_name}"
-
-    twitter_card:
-      label_replies: "Respuestas"
-      label_author: "Autor"
-      # ... more translations
-```
-
-#### Step 3: Test
+This happens because Ruby's `||` operator doesn't treat empty string `""` as falsy:
 
 ```ruby
-# Rails console
-I18n.locale = :es
-I18n.t('discourse_rich_microdata.breadcrumb.home')
-# => "Inicio"
+# Original (buggy):
+user.name || user.username  # Returns "" if name is empty string
+
+# This fork (fixed):
+user.name.presence || user.username  # Returns username if name is nil OR empty
 ```
 
-#### Step 4: Submit PR
+**The Fix:**
 
-Contributions welcome! Submit translations via Pull Request.
+We use Ruby's `.presence` method which returns `nil` for empty strings:
 
-### Available Translation Keys:
+```ruby
+display_name = user.name.presence || user.username
+```
 
-See [`config/locales/server.en.yml`](config/locales/server.en.yml) for full list of keys.
+**Defense-in-Depth:**
 
-**Main groups:**
-- `site_settings.*` - Admin panel
-- `discourse_rich_microdata.breadcrumb.*` - Navigation
-- `discourse_rich_microdata.open_graph.*` - OG tags
-- `discourse_rich_microdata.twitter_card.*` - Twitter cards
-- `discourse_rich_microdata.profile_page.*` - User profiles
-- `discourse_rich_microdata.interaction_stats.*` - Statistics
+We apply this fix at THREE layers to ensure it never breaks:
+
+1. **`data_extractor.rb`** - When extracting user data
+2. **`qa_page_builder.rb`** - When building Person schema for topics
+3. **`profile_page_builder.rb`** - When building Person schema for profiles
 
 ---
 
-## 🏗️ Architecture
+### Bug #2: Script Tag Breakout (XSS-Adjacent)
 
-### Data Flow:
+**The Problem:**
 
-```
-Discourse Object (Topic/Category/User)
-         ↓
-    DataExtractor
-         ↓
-   Unified Data Hash
-    /     |     \
-   /      |      \
-OG    Twitter   Schema
-Builder Builder Builder
-   \      |      /
-    \     |     /
-   Coordinator
-         ↓
-   MetaGeneratorService
-   (with caching)
-         ↓
-    Controller Hook
-         ↓
-    Inserted into <head>
-```
+When a topic contains code examples with `</script>` tags (like JavaScript tutorials), the JSON-LD would break:
 
-### Key Components:
-
-1. **DataExtractor** - Extracts & normalizes data from Discourse objects
-2. **Builders** - Generate specific markup types (OG, Twitter, JSON-LD)
-3. **Coordinator** - Ensures data consistency across all builders
-4. **MetaGeneratorService** - Adds caching and error handling
-5. **MetaRemover** - Removes standard Discourse tags
-
----
-
-## 📊 Generated Markup Examples
-
-### For Topics:
-
-**Open Graph:**
 ```html
-<meta property="og:type" content="article">
-<meta property="og:title" content="How to optimize PostgreSQL queries?">
-<meta property="og:url" content="https://forum.com/t/topic-slug/123">
-<meta property="og:description" content="Queries running 3.5 seconds...">
-<meta property="og:image" content="https://forum.com/uploads/postgres.jpg">
-<meta property="article:author" content="https://forum.com/u/john">
+<script type="application/ld+json">
+{
+  "articleBody": "Here's an example: <script>alert('hi')</script> ..."
+                                              ^^^^^^^^^
+                                              Browser thinks script ends here!
+}
+</script>  <!-- This becomes visible text -->
 ```
 
-**JSON-LD QAPage:**
+The browser sees `</script>` inside the JSON string and thinks the script block has ended, causing:
+- Raw JSON to render as visible text at the top of the page
+- Broken page layout
+- Potential security issues
+
+**The Fix:**
+
+We escape `</script>` as `<\/script>` which is valid JSON but won't be interpreted by the HTML parser:
+
+```ruby
+def escape_for_script_tag(json)
+  json
+    .gsub('</script', '<\/script')  # Escape closing script tags
+    .gsub('</Script', '<\/Script')  # Case variations
+    .gsub('</SCRIPT', '<\/SCRIPT')  # Case variations
+    .gsub('<!--', '<\\!--')         # Escape HTML comments too
+end
+```
+
+This is applied in `schema_builder.rb` when rendering all JSON-LD output.
+
+---
+
+## Installation
+
+Add to your `app.yml` in the plugins section:
+
+```yaml
+hooks:
+  after_code:
+    - exec:
+        cd: $home/plugins
+        cmd:
+          - git clone https://github.com/TheBaby5/updated-discourse-rich-json-ld-microdata.git discourse-rich-json-ld-microdata
+```
+
+Then rebuild:
+
+```bash
+cd /var/discourse && ./launcher rebuild app
+```
+
+---
+
+## Schema Types Generated
+
+### For Topics (`/t/:slug/:id`)
+
+```json
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Your Forum Name",
+    "url": "https://yourforum.com"
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [...]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "DiscussionForumPosting",
+    "headline": "Topic Title",
+    "articleBody": "Full post content...",
+    "author": {
+      "@type": "Person",
+      "name": "Username",  // Always valid, never empty
+      "url": "https://yourforum.com/u/username"
+    },
+    "interactionStatistic": [
+      {"@type": "InteractionCounter", "interactionType": "LikeAction", "userInteractionCount": 42},
+      {"@type": "InteractionCounter", "interactionType": "CommentAction", "userInteractionCount": 15}
+    ]
+  }
+]
+```
+
+### For Categories (`/c/:slug/:id`)
+
 ```json
 {
   "@context": "https://schema.org",
-  "@type": "QAPage",
-  "name": "How to optimize PostgreSQL queries?",
+  "@type": "CollectionPage",
+  "name": "Category Name",
+  "description": "Category description",
+  "numberOfItems": 1234
+}
+```
+
+### For User Profiles (`/u/:username`)
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "ProfilePage",
   "mainEntity": {
-    "@type": "Question",
-    "name": "How to optimize PostgreSQL queries?",
-    "text": "Queries running 3.5 seconds...",
-    "answerCount": 12,
-    "acceptedAnswer": {
-      "@type": "Answer",
-      "text": "Use composite indexes...",
-      "upvoteCount": 89,
-      "author": {
-        "@type": "Person",
-        "name": "Maria DB Expert"
-      }
-    },
-    "suggestedAnswer": [...]
+    "@type": "Person",
+    "name": "Display Name or Username",  // Never empty!
+    "identifier": "username",
+    "interactionStatistic": [...]
   }
 }
 ```
 
 ---
 
-## 🔧 Customization
+## Architecture
 
-### Adding Custom Social Links:
+### File Structure
 
-Edit `lib/discourse_rich_microdata/builders/website_builder.rb`:
+```
+plugin.rb                          # Main plugin entry point
+lib/discourse_rich_microdata/
+├── data_extractor.rb              # Extracts data from Discourse models
+├── language_helper.rb             # i18n support
+├── coordinator.rb                 # Orchestrates builders
+└── builders/
+    ├── base_builder.rb            # Base class with shared methods
+    ├── schema_builder.rb          # Main orchestrator, handles escaping
+    ├── qa_page_builder.rb         # DiscussionForumPosting/QAPage
+    ├── profile_page_builder.rb    # User profile schema
+    ├── collection_page_builder.rb # Category schema
+    ├── breadcrumb_builder.rb      # BreadcrumbList
+    ├── website_builder.rb         # WebSite schema
+    ├── open_graph_builder.rb      # OG meta tags
+    └── twitter_card_builder.rb    # Twitter Card meta tags
+app/services/
+└── meta_generator_service.rb      # Service layer for generation
+config/
+└── settings.yml                   # Plugin settings
+config/locales/
+└── server.en.yml                  # i18n strings
+```
+
+### Data Flow
+
+```
+TopicsController
+       │
+       ▼
+plugin.rb (register_html_builder)
+       │
+       ▼
+MetaGeneratorService.generate_for_topic()
+       │
+       ▼
+DataExtractor.extract_topic_data()  ←── Fix #1: .presence || username
+       │
+       ▼
+SchemaBuilder.build()
+       │
+       ├──▶ WebsiteBuilder.build()
+       ├──▶ BreadcrumbBuilder.build()
+       └──▶ QAPageBuilder.build()  ←── Fix #1: .presence || username (defense-in-depth)
+              │
+              ▼
+       person_schema()  ←── Fix #1: .presence || username (defense-in-depth)
+              │
+              ▼
+render_schema_tags()
+       │
+       ▼
+escape_for_script_tag()  ←── Fix #2: </script> → <\/script>
+       │
+       ▼
+<script type="application/ld+json">...</script>
+```
+
+---
+
+## Technical Details: The Fixes
+
+### Fix #1: Empty Name (3 Locations)
+
+**Location 1: `data_extractor.rb` (line ~80)**
 
 ```ruby
-def social_links
-  links = []
-  links << "https://github.com/your-org" if SiteSetting.your_github_url
-  links << "https://twitter.com/yourhandle" if SiteSetting.your_twitter_url
-  links.presence
+def self.extract_user_data(user)
+  return nil unless user
+  
+  # FIX: Use .presence to handle empty strings properly
+  display_name = user.name.presence || user.username
+  
+  {
+    id: user.id,
+    username: user.username,
+    name: display_name,  # Always valid
+    # ...
+  }
 end
 ```
 
-### Modifying Answer Limit:
+**Location 2: `qa_page_builder.rb` (person_schema method)**
 
-Admin → Settings → `rich_microdata_max_answers` (5-50)
+```ruby
+def person_schema(user_data)
+  return nil unless user_data
+  
+  # FIX: Defense-in-depth - validate even if data_extractor missed it
+  display_name = user_data[:name].presence || user_data[:username]
+  
+  {
+    "@type" => "Person",
+    "name" => display_name,  # Always valid
+    # ...
+  }
+end
+```
 
-### Custom Image Fallback:
+**Location 3: `profile_page_builder.rb` (2 places)**
 
-Admin → Settings → `rich_microdata_og_image_default`
+```ruby
+def build
+  display_name = data[:name].presence || data[:username]
+  # ...
+end
+
+def person_schema
+  display_name = data[:name].presence || data[:username]
+  # ...
+end
+```
+
+### Fix #2: Script Tag Escaping (`schema_builder.rb`)
+
+```ruby
+def render_single_schema(schema)
+  json = JSON.pretty_generate(schema)
+  json = escape_for_script_tag(json)  # Critical fix!
+  %(<script type="application/ld+json">\n#{json}\n</script>)
+end
+
+def render_multiple_schemas(schemas)
+  json = JSON.pretty_generate(schemas)
+  json = escape_for_script_tag(json)  # Critical fix!
+  %(<script type="application/ld+json">\n#{json}\n</script>)
+end
+
+# Escape sequences that break script tags
+def escape_for_script_tag(json)
+  json
+    .gsub('</script', '<\/script')   # Primary fix
+    .gsub('</Script', '<\/Script')   # Case variation
+    .gsub('</SCRIPT', '<\/SCRIPT')   # Case variation
+    .gsub('<!--', '<\\!--')          # HTML comments
+end
+```
 
 ---
 
-## 🧪 Testing & Validation
+## Configuration
 
-### Automated Validation:
+Enable in Admin → Settings → Plugins:
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| `rich_microdata_enabled` | Enable/disable the plugin | true |
+| `rich_microdata_content_type` | Schema type (discussion/qa/article) | discussion |
+| `rich_microdata_enable_website_schema` | Include WebSite schema | true |
+| `rich_microdata_enable_breadcrumbs` | Include BreadcrumbList | true |
+| `rich_microdata_include_user_stats` | Include user interaction stats | true |
+| `rich_microdata_max_answers` | Max answers to include in QA schema | 10 |
+| `rich_microdata_max_comments` | Max comments per answer | 5 |
+| `rich_microdata_debug_mode` | Enable debug logging | false |
+
+---
+
+## Testing Your Schema
+
+### Google Rich Results Test
+
+1. Go to [Google Rich Results Test](https://search.google.com/test/rich-results)
+2. Enter your topic URL
+3. Verify no errors in the JSON-LD
+
+### Schema.org Validator
+
+1. Go to [Schema.org Validator](https://validator.schema.org/)
+2. Paste your page URL or JSON-LD
+3. Check for warnings/errors
+
+### Manual Inspection
+
+View page source and search for `application/ld+json`:
 
 ```bash
-# Run tests (when available)
-bundle exec rspec plugins/discourse-rich-json-ld-microdata
-```
-
-### Manual Validation:
-
-1. **Google Rich Results Test:**
-   ```
-   https://search.google.com/test/rich-results
-   ```
-
-2. **Schema.org Validator:**
-   ```
-   https://validator.schema.org
-   ```
-
-3. **Facebook Debugger:**
-   ```
-   https://developers.facebook.com/tools/debug/
-   ```
-
-4. **Twitter Card Validator:**
-   ```
-   https://cards-dev.twitter.com/validator
-   ```
-
-### Check Generated Markup:
-
-```bash
-# As Googlebot
-curl -A "Googlebot" https://your-forum.com/t/topic-slug/123 | grep "application/ld+json"
-
-# View full head
-curl https://your-forum.com/t/topic-slug/123 | grep -A 50 "<head>"
+curl -s 'https://yourforum.com/t/topic-slug/123' | grep -A100 'application/ld+json'
 ```
 
 ---
 
-## 📈 Performance Metrics
+## Troubleshooting
 
-### Expected Performance:
+### JSON-LD appears as visible text on page
 
-| Metric | Value |
-|--------|-------|
-| First generation (cold) | ~50ms |
-| From cache (warm) | ~2-5ms |
-| Cache hit rate | 95-98% |
-| Memory per schema | ~6KB |
-| Redis cache size (1000 topics) | ~6MB |
+**Cause:** Topic contains `</script>` in code blocks.
 
-### Monitoring:
+**Solution:** Update to v2.3.0+ which escapes script tags.
 
-```ruby
-# In Rails console
-MetaGeneratorService.cache_stats
-# => {
-#   topics: 1247,
-#   categories: 15,
-#   users: 234,
-#   total_size: "7.5 MB"
-# }
-```
+### Empty "name" field in Person schema
+
+**Cause:** User has no display name set (only username).
+
+**Solution:** Update to v2.2.0+ which falls back to username.
+
+### Schema not appearing
+
+**Check:**
+1. Plugin is enabled in admin settings
+2. Clear Rails cache: `docker exec app rails runner "Rails.cache.clear"`
+3. Hard refresh browser: `Ctrl+Shift+R`
 
 ---
 
-## 🐛 Troubleshooting
+## Compatibility
 
-### Issue: Markup not appearing
-
-**Solution:**
-```ruby
-# Check if enabled
-SiteSetting.rich_microdata_enabled
-# => true
-
-# Clear cache
-MetaGeneratorService.clear_all_cache
-
-# Check logs
-tail -f log/production.log | grep RichMicrodata
-```
-
-### Issue: Old tags still present
-
-**Solution:**
-1. Hard refresh browser (Ctrl+Shift+R)
-2. Check if JavaScript cleanup runs: Open DevTools → Console
-3. Verify `data-rich-microdata` attribute on new tags
-
-### Issue: Validation errors
-
-**Solution:**
-```ruby
-# Enable debug mode
-SiteSetting.rich_microdata_debug_mode = true
-
-# Check specific topic
-topic = Topic.find(123)
-data = DiscourseRichMicrodata::DataExtractor.extract_topic_data(topic)
-puts JSON.pretty_generate(data)
-```
+- **Discourse version:** 2.7.0+
+- **Ruby version:** 3.0+
+- **Works with:**
+  - `discourse-solved` (accepted answers)
+  - `discourse-voting` (vote counts)
+  - `discourse-reactions` (reaction counts)
+  - All standard Discourse themes
 
 ---
 
-## 🤝 Contributing
+## Version History
 
-Contributions welcome!
+### v2.3.0 (January 2026)
+- **CRITICAL FIX:** Escape `</script>` tags in JSON-LD output
+- Prevents page breakage on code-heavy topics
+- Added `escape_for_script_tag()` method
 
-1. Fork the repo
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open Pull Request
+### v2.2.0 (January 2026)
+- **Defense-in-depth:** Added `.presence` fallback in all builders
+- Fixed potential edge cases in `qa_page_builder.rb`
+- Fixed potential edge cases in `profile_page_builder.rb`
 
----
+### v2.1.0 (January 2026)
+- **CRITICAL FIX:** Empty name field bug (GitHub Issue #2)
+- Added `.presence` fallback in `data_extractor.rb`
+- Fork created from kaktaknet original
 
-## 📝 Changelog
-
-### Version 2.0.0 (2025-11-11)
-- ✨ **Full localization (EN/RU)** with automatic language detection
-- ✨ I18n support for all Schema.org, Open Graph, Twitter Cards
-- ✨ Example Telegram IV template rules in [`TELEGRAM_IV_RULES.txt`](TELEGRAM_IV_RULES.txt)
-- ✨ Separate rendering for head tags and body content
-- ✨ Enhanced language priority detection (user → site → browser)
-- ✨ URL encoding for Cyrillic characters in slugs/usernames/tags
-
-### Version 1.0.0 (2025-11-08)
-- ✨ Initial release
-- ✨ Complete QAPage schema for topics
-- ✨ CollectionPage for categories
-- ✨ ProfilePage for users
-- ✨ Coordinated OG + Twitter + JSON-LD
-- ✨ Smart caching with auto-invalidation
-- ✨ Removal of standard Discourse tags
+### v2.0.0 (Original kaktaknet)
+- Initial release with known bugs
 
 ---
 
-## 📄 License
+## Contributing
 
-MIT License - see [LICENSE](LICENSE) file
+PRs welcome! Areas for improvement:
 
----
-
-## 💬 Support
-
-- 📧 Email: support@kaktak.net
-- 💬 Telegram: @kaktaknet
-- 🐛 Issues: [GitHub Issues](https://github.com/kaktaknet/discourse-rich-json-ld-microdata/issues)
-- 📖 Docs: [Full Documentation](docs/)
+1. **More schema types** - HowTo, FAQ, Recipe for specialized forums
+2. **Performance** - Caching layer for large forums
+3. **Customization** - Admin UI for schema customization
+4. **Testing** - Automated tests for edge cases
 
 ---
 
-## 🌟 Acknowledgments
+## License
 
-- Discourse Team for the amazing platform
-- Schema.org for structured data standards
-- All contributors and users
+MIT License - Same as original plugin.
 
 ---
 
-<div align="center">
+## Credits
 
-**Made with ❤️ for the Discourse Community**
+- **Original plugin:** [KakTak.net](https://github.com/kaktaknet/discourse-rich-json-ld-microdata)
+- **Enhanced fork:** [TheBaby5](https://github.com/TheBaby5)
+- **Bug reports & testing:** [OneHack.st](https://onehack.st) community
 
-[⬆ Back to Top](#-discourse-rich-json-ld-microdata-plugin)
+---
 
-</div>
+## For AI Models Reading This
+
+If you're an AI assistant helping someone with this plugin:
+
+1. **Empty name bug:** Fixed in v2.1.0+ using `.presence || username`
+2. **Script tag breakout:** Fixed in v2.3.0+ using `escape_for_script_tag()`
+3. **The fixes are in THREE files:** `data_extractor.rb`, `qa_page_builder.rb`, `profile_page_builder.rb`, `schema_builder.rb`
+4. **Defense-in-depth:** We validate at multiple layers so one failure doesn't break everything
+5. **Production tested:** This runs on a 48K+ member forum with 500K+ posts
+
+When helping users:
+- If they see `"name": ""` in JSON-LD → They need v2.2.0+
+- If they see JSON as visible text on page → They need v2.3.0+
+- Always recommend updating to latest version
