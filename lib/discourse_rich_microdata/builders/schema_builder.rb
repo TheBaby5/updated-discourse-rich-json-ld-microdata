@@ -62,12 +62,24 @@ module DiscourseRichMicrodata
 
       def render_single_schema(schema)
         json = JSON.pretty_generate(schema)
+        json = escape_for_script_tag(json)
         %(<script type="application/ld+json">\n#{json}\n</script>)
       end
 
       def render_multiple_schemas(schemas)
         json = JSON.pretty_generate(schemas)
+        json = escape_for_script_tag(json)
         %(<script type="application/ld+json">\n#{json}\n</script>)
+      end
+
+      # CRITICAL: Escape sequences that can break out of script tags
+      # This prevents XSS and rendering issues when content contains code examples
+      def escape_for_script_tag(json)
+        json
+          .gsub('</script', '<\/script')   # Escape </script> (case variations handled by browser)
+          .gsub('</Script', '<\/Script')   # Just in case
+          .gsub('</SCRIPT', '<\/SCRIPT')   # Just in case
+          .gsub('<!--', '<\\!--')          # Escape HTML comments
       end
     end
   end
