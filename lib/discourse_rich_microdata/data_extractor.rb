@@ -79,10 +79,15 @@ module DiscourseRichMicrodata
       profile = user.user_profile
       user_stat = user.user_stat
 
+      # FIX: Use .presence to handle empty strings properly
+      # When user.name is "" (empty string), it should fallback to username
+      # Original bug: user.name || user.username didn't handle empty strings
+      display_name = user.name.presence || user.username
+
       {
         id: user.id,
         username: user.username,
-        name: user.name || user.username,
+        name: display_name,
         url: "#{Discourse.base_url}/u/#{ERB::Util.url_encode(user.username)}",
         avatar_url: user_avatar_url(user),
         title: user.title,
