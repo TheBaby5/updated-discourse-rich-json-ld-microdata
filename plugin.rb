@@ -2,9 +2,9 @@
 
 # name: discourse-rich-json-ld-microdata
 # about: Enhances Discourse meta tags with comprehensive Open Graph and Schema.org JSON-LD markup for better SEO and LLM coverage
-# version: 2.0.0
-# authors: KakTak.net
-# url: https://github.com/kaktaknet/discourse-rich-json-ld-microdata
+# version: 2.1.0
+# authors: TheBaby5 (fork maintainer), KakTak.net (original)
+# url: https://github.com/TheBaby5/updated-discourse-rich-json-ld-microdata
 # license: MIT
 # required_version: 2.7.0
 
